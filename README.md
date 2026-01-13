@@ -10,6 +10,7 @@ A Open Source - lightweight real-time NVIDIA GPU monitor written in Python.
 - Temperature
 - Power draw
 - Single-box live UI (nvidia-smi style)
+- Works on Nvidia Optimus
 
 ## Requirements
 - NVIDIA GPU
