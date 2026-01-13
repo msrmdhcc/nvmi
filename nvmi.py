@@ -1,74 +1,103 @@
 import time
 import pynvml
+
 from rich.console import Console
 from rich.table import Table
 from rich.live import Live
-
-pynvml.nvmlInit()
+from rich.text import Text
+from rich.box import ROUNDED
 
 console = Console()
-gpu_count = pynvml.nvmlDeviceGetCount()
+
+
+def gradient_color(value, min_val, max_val):
+    value = max(min_val, min(value, max_val))
+    ratio = (value - min_val) / (max_val - min_val)
+
+    r = int(255 * ratio)
+    g = int(255 * (1 - ratio))
+    return f"rgb({r},{g},0)"
 
 def make_table():
-    table = Table(title="NVMI", expand=True)
-    table.add_column("GPU", justify="center")
-    table.add_column("Util %", justify="center")
-    table.add_column("Memory", justify="center")
-    table.add_column("Temp", justify="center")
-    table.add_column("Power", justify="center")
+    table = Table(
+        title="[bold rgb(118,185,0)]NVMI[/bold rgb(118,185,0)]  —  by msrmdhcc",
+        expand=True,
+        box=ROUNDED,
+        show_lines=False,
+        header_style="bold white"
+    )
+
+    table.add_column("GPU", justify="left", style="bold rgb(118,185,0)")
+    table.add_column("UTIL", justify="right")
+    table.add_column("MEM", justify="right")
+    table.add_column("TEMP", justify="right")
+    table.add_column("POWER", justify="right")
+
+    gpu_count = pynvml.nvmlDeviceGetCount()
 
     for i in range(gpu_count):
         handle = pynvml.nvmlDeviceGetHandleByIndex(i)
         name = pynvml.nvmlDeviceGetName(handle)
 
-        # Defaults in case NVML fails
-        util_str = mem_str = temp_str = power_str = "N/A"
-
         try:
-            util = pynvml.nvmlDeviceGetUtilizationRates(handle)
-            util_str = f"{util.gpu}%"
+            util = pynvml.nvmlDeviceGetUtilizationRates(handle).gpu
+            util_cell = Text(f"{util:>3}%", style=gradient_color(util, 0, 100))
         except:
-            pass
+            util_cell = Text("N/A")
+
 
         try:
             mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
-            mem_str = f"{mem.used/1024**2:.0f} / {mem.total/1024**2:.0f} MiB"
+            mem_cell = Text(
+                f"{mem.used // 1024**2:>4} / {mem.total // 1024**2} MiB"
+            )
         except:
-            pass
+            mem_cell = Text("N/A")
+
 
         try:
             temp = pynvml.nvmlDeviceGetTemperature(
                 handle, pynvml.NVML_TEMPERATURE_GPU
             )
-            temp_str = f"{temp} °C"
+            temp_cell = Text(
+                f"{temp:>3}°C",
+                style=gradient_color(temp, 30, 100)
+            )
         except:
-            pass
+            temp_cell = Text("N/A")
 
         try:
             power = pynvml.nvmlDeviceGetPowerUsage(handle) / 1000
             limit = pynvml.nvmlDeviceGetEnforcedPowerLimit(handle) / 1000
-            power_str = f"{power:.1f} / {limit:.0f} W"
+            power_cell = Text(f"{power:>4.1f} / {limit:.0f} W")
         except:
-            pass
+            power_cell = Text("N/A")
+
+        gpu_name = Text(f"{i}  {name}", style="bold rgb(118,185,0)")
 
         table.add_row(
-            f"{i} ({name})",
-            util_str,
-            mem_str,
-            temp_str,
-            power_str,
+            gpu_name,
+            util_cell,
+            mem_cell,
+            temp_cell,
+            power_cell,
         )
 
     return table
 
-try:
-    with Live(make_table(), refresh_per_second=2, console=console) as live:
-        while True:
-            live.update(make_table())
-            time.sleep(1)
+def main():
+    pynvml.nvmlInit()
 
-except KeyboardInterrupt:
-    pass
+    try:
+        with Live(make_table(), refresh_per_second=1, console=console) as live:
+            while True:
+                live.update(make_table())
+                time.sleep(1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        pynvml.nvmlShutdown()
 
-finally:
-    pynvml.nvmlShutdown()
+
+if __name__ == "__main__":
+    main()
