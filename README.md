@@ -2,6 +2,8 @@
 
 A lightweight real-time NVIDIA GPU monitor written in Python.
 
+![NVMI Live GPU Monitor](screenshots/nvmi-display.png)
+
 ## Features
 - Live GPU utilization
 - Memory usage
