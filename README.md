@@ -1,6 +1,6 @@
 # NVMI 
 
-A Open Source - lightweight real-time NVIDIA GPU monitor written in Python. / Software ringan real-time untuk Monitoring NVIDIA GPU menggunakan Python
+A Open Source - lightweight real-time NVIDIA GPU monitor written in Python.
 
 ![NVMI Live GPU Monitor](screenshots/nvmi-display.png)
 
@@ -14,6 +14,7 @@ A Open Source - lightweight real-time NVIDIA GPU monitor written in Python. / So
 ## Requirements
 - NVIDIA GPU
 - NVIDIA drivers
+- Python (for who wants to build)
 
 ## Install
 ```bash
