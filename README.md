@@ -2,7 +2,7 @@
 
 A Open Source - lightweight real-time NVIDIA GPU monitor written in Python.
 
-![NVMI Live GPU Monitor](screenshots/nvmi-display.png)
+![NVMI Live GPU Monitor](screenshots/nvmi-display-new.png)
 
 ## Features
 - Live GPU utilization
